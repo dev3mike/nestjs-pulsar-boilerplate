@@ -12,12 +12,13 @@ export class AppConsumer extends PulsarConsumer<any> {
         super(
             pulsarClient,
             {
-                topic: topicName.dev.appService.test,
-                subscription: 'subscription',
+                topic: topicName,
+                subscriptionType: 'Shared',
+                subscription: 'shared',
             });
     }
 
-    protected handleMessage(data: any): void {
-        this.logger.log("Handling the message", data);
+    protected handleMessage(data: any, messageId: string): void {
+        this.logger.log("Handling the message", messageId, data);
     }
 }

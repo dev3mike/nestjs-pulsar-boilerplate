@@ -10,7 +10,7 @@ export class AppService {
   async produceMessage(request: any) {
 
     for (let i = 0; i <= 1000; i++)
-      this.producerService.produce(topicName.dev.appService.test, request);
+      this.producerService.produce(topicName, request);
 
   }
 }

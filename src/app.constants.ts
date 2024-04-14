@@ -1,7 +1,1 @@
-export const topicName = {
-    dev: {
-        appService: {
-            test: 'public/appservice/test'
-        }
-    }
-}
+export const topicName = 'public-appservice-test'

@@ -28,8 +28,7 @@ export abstract class PulsarConsumer<T> implements OnModuleInit {
             try {
                 message = await this.consumer.receive();
                 const data: T = JSON.parse(message.getData().toString());
-                await this.handleMessage(data);
-                console.log(data);
+                await this.handleMessage(data, message.getMessageId().toString());
             } catch (err) {
                 this.logger.error("Failed to consume the message", err);
             }
@@ -43,7 +42,7 @@ export abstract class PulsarConsumer<T> implements OnModuleInit {
         }
     }
 
-    protected abstract handleMessage(data: T): Promise<void> | void;
+    protected abstract handleMessage(data: T, messageId: string): Promise<void> | void;
 
     async onModuleInit() {
         await this.subscribe();
