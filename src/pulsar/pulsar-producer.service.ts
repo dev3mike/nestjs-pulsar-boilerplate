@@ -8,7 +8,7 @@ export class PulsarProducerService {
 
     constructor(@Inject(PULSAR_CLIENT) private readonly pulsarClient: Client) { }
 
-    async produce(topic: Lowercase<string>, message: object) {
+    async produce(topic: string, message: object) {
         const producer = await this.getProducerByTopic(topic);
         await producer.send({
             data: Buffer.from(JSON.stringify(message))

@@ -1,21 +1,24 @@
-import { Logger } from "@nestjs/common";
+import { Logger, OnModuleInit } from "@nestjs/common";
 import { nextTick } from "process";
 import { Client, Consumer, ConsumerConfig, Message } from "pulsar-client";
 
-export abstract class PulsarConsumer<T> {
+export abstract class PulsarConsumer<T> implements OnModuleInit {
     private consumer: Consumer;
-    private readonly logger = new Logger(this.config.topic);
+    protected readonly logger = new Logger(this.config.topic);
     protected isConsuming = true;
 
     constructor(
         private readonly pulsarClient: Client,
         private readonly config: ConsumerConfig,
-        private readonly onMessageHandler: (messageData: T) => void
     ) { }
 
     protected async subscribe() {
-        this.consumer = await this.pulsarClient.subscribe(this.config);
-        nextTick(this.listenForMessages.bind(this));
+        try {
+            this.consumer = await this.pulsarClient.subscribe(this.config);
+            nextTick(this.listenForMessages.bind(this));
+        } catch (err) {
+            this.logger.error("Failed to subscribe", err);
+        }
     }
 
     private async listenForMessages() {
@@ -25,7 +28,7 @@ export abstract class PulsarConsumer<T> {
             try {
                 message = await this.consumer.receive();
                 const data: T = JSON.parse(message.getData().toString());
-                this.onMessageHandler(data);
+                await this.handleMessage(data);
                 console.log(data);
             } catch (err) {
                 this.logger.error("Failed to consume the message", err);
@@ -38,5 +41,11 @@ export abstract class PulsarConsumer<T> {
                 this.logger.error("Failed to acknowledge the message", err);
             }
         }
+    }
+
+    protected abstract handleMessage(data: T): Promise<void> | void;
+
+    async onModuleInit() {
+        await this.subscribe();
     }
 }
