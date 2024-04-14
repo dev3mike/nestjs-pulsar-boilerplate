@@ -3,10 +3,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PulsarModule } from './pulsar/pulsar.module';
 import { ConfigModule } from '@nestjs/config';
+import { AppConsumer } from 'src/app.consumer';
 
 @Module({
   imports: [ConfigModule.forRoot(), PulsarModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AppConsumer],
 })
 export class AppModule { }
